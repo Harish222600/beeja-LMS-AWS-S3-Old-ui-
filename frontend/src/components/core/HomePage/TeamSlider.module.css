@@ -1,0 +1,128 @@
+/* Mobile-first responsive design */
+.sliderContainer {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Hide scrollbar but allow scrolling */
+.sliderContainer::-webkit-scrollbar {
+  display: none;
+}
+
+.sliderContainer {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Card hover effect */
+.teamCard {
+  transition: all 0.3s ease;
+  transform-origin: center;
+  backface-visibility: hidden;
+}
+
+.teamCard:hover {
+  transform: translateY(-5px);
+}
+
+/* Navigation buttons hover effect */
+.navButton {
+  transition: all 0.2s ease;
+  opacity: 0.7;
+}
+
+.navButton:hover {
+  opacity: 1;
+
+}
+
+/* Pagination dots animation */
+.paginationDot {
+  transition: all 0.3s ease;
+}
+
+.paginationDot.active {
+  width: 1rem;
+}
+
+/* Responsive breakpoints */
+@media (max-width: 768px) {
+  .cardContainer {
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .cardContainer {
+    padding: 0 1rem;
+  }
+}
+
+/* Smooth sliding animation */
+.slideTransition {
+  transition: transform 0.5s ease-in-out;
+}
+
+/* Card shadow on hover */
+.teamCard:hover {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Image hover effect */
+.memberImage {
+  transition: transform 0.3s ease;
+}
+
+.teamCard:hover .memberImage {
+  transform: scale(1.05);
+}
+
+/* Gradient overlay for cards */
+.cardOverlay {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.1) 100%
+  );
+}
+
+/* Text truncation for mobile */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Mobile specific optimizations */
+@media (max-width: 640px) {
+  .teamCard {
+    min-height: auto;
+    max-height: 240px;
+  }
+  
+  .cardContainer {
+    gap: 0.5rem;
+    padding: 0 0.5rem;
+  }
+  
+  .navButton {
+    width: 36px;
+    height: 36px;
+    padding: 8px;
+  }
+}
+
+/* Tablet optimizations */
+@media (min-width: 641px) and (max-width: 1023px) {
+  .teamCard {
+    min-height: 320px;
+  }
+}
+
+/* Desktop optimizations */
+@media (min-width: 1024px) {
+  .teamCard {
+    min-height: 360px;
+  }
+}

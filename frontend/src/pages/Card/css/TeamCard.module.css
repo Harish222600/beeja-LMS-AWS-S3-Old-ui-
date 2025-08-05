@@ -1,0 +1,149 @@
+/* 
+.teamCardContainer{
+  width: 100%;
+    border-bottom: #ff9900 1px solid;
+} */
+/* Section styles */
+.section {
+  width: 90vw;
+  margin: 2rem auto;
+  max-width: 1170px;
+
+
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* Slider container */
+.sectionCenter {
+  margin: 0 auto;
+  margin-top: 4rem;
+  width: 80vw;
+  height: 450px;
+  max-width: 800px;
+  text-align: center;
+  position: relative;
+  display: flex;
+  overflow: hidden;
+}
+
+/* Card styles */
+.cardContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: all 0.3s linear;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cardContainer h4{
+    text-transform: capitalize;
+  color: #ff9900;
+  font-size: 25px;
+  font-weight: bolder;
+}
+
+.activeSlide {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.lastSlide {
+  transform: translateX(-100%);
+}
+
+.nextSlide {
+  transform: translateX(100%);
+}
+
+.personImg {
+  border-radius: 50%;
+  margin-bottom: 1rem;
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border: 4px solid #e2e8f0;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.personTitle {
+  text-transform: capitalize;
+  margin-bottom: 0.75rem;
+  color: #ffffff;
+  font-weight: bolder;
+  font-size: 15px;
+}
+
+.text {
+  max-width: 35em;
+  margin: 0 auto;
+  margin-top: 2rem;
+  line-height: 2;
+  color: #838894;
+  font-weight: bolder;
+}
+
+.icon {
+  font-size: 3rem;
+  margin-top: 1rem;
+  color: #ff9900;
+}
+
+/* Navigation buttons */
+.prev,
+.next {
+  position: absolute;
+  top: 200px;
+  transform: translateY(-50%);
+  color: white;
+  width: 3rem;        /* Bigger button */
+  height: 3rem;
+  display: grid;
+  place-items: center;
+  border: none;
+  background: transparent;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Add this to increase icon size */
+.prev svg,
+.next svg {
+  font-size: 2.5rem;
+}
+
+
+.prev:hover,
+.next:hover {
+  color: #ff9900;
+}
+
+.prev {
+  left: 0;
+}
+
+.next {
+  right: 0;
+}
+
+@media (min-width: 800px) {
+  .text {
+    max-width: 45em;
+  }
+  
+  .prev,
+  .next {
+    width: 2rem;
+    height: 2rem;
+    font-size: 1.5rem;
+  }
+}
