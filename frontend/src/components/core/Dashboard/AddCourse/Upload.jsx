@@ -4,11 +4,13 @@ import { FiUploadCloud } from "react-icons/fi"
 import { useSelector } from "react-redux"
 import { uploadFile, ResumableUploader } from "../../../../utils/directUpload"
 import VideoUploadProgress from "../../../common/VideoUploadProgress"
+import { useUpload } from "../../../../contexts/UploadContext"
 
 
 
 export default function Upload({ name, label, register, setValue, errors, video = false, viewData = null, editData = null, setImageFile = null, subSectionId = null }) {
   const { token } = useSelector((state) => state.auth)
+  const uploadContext = useUpload()
   const [selectedFile, setSelectedFile] = useState(null)
   const [previewSource, setPreviewSource] = useState("")
   const [isLoadingPreview, setIsLoadingPreview] = useState(false)
@@ -33,6 +35,7 @@ export default function Upload({ name, label, register, setValue, errors, video 
   const [uploadResult, setUploadResult] = useState(null)
   const [uploader, setUploader] = useState(null)
   const [uploadStatus, setUploadStatus] = useState('idle') // 'idle', 'uploading', 'completed', 'error', 'cancelled'
+  const [uploadId, setUploadId] = useState(null)
 
   const onDrop = (acceptedFiles) => {
     const file = acceptedFiles[0]
@@ -79,11 +82,31 @@ export default function Upload({ name, label, register, setValue, errors, video 
   const startUpload = async (file) => {
     try {
       console.log('🚀 Starting upload for:', file.name)
+      
+      // Generate upload ID and register with context
+      const newUploadId = uploadContext.generateUploadId()
+      setUploadId(newUploadId)
+      
       setIsUploading(true)
       setUploadStatus('uploading')
       setUploadError(null)
       
       const folder = video ? 'videos' : 'images'
+      
+      // Create abort controller for cancellation
+      const abortController = new AbortController()
+      
+      // Register upload with context
+      uploadContext.registerUpload(newUploadId, {
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type,
+        fieldName: name,
+        status: 'uploading',
+        progress: 0,
+        abortController,
+        uploader: null // Will be set later for resumable uploads
+      })
       
       // Check if we need resumable upload
       const needsResumableUpload = file.size > 50 * 1024 * 1024 // 50MB
@@ -94,6 +117,10 @@ export default function Upload({ name, label, register, setValue, errors, video 
         const resumableUploader = new ResumableUploader(file, folder, {
           onProgress: (progressData) => {
             setUploadProgress(progressData.progress)
+            uploadContext.updateUploadProgress(newUploadId, {
+              progress: progressData.progress,
+              status: 'uploading'
+            })
             console.log('Upload progress:', progressData)
           },
           onError: (error) => {
@@ -101,6 +128,10 @@ export default function Upload({ name, label, register, setValue, errors, video 
             setUploadError(error.message)
             setUploadStatus('error')
             setIsUploading(false)
+            uploadContext.updateUploadProgress(newUploadId, {
+              status: 'error',
+              error: error.message
+            })
           },
           onComplete: (result) => {
             console.log('Upload completed:', result)
@@ -109,9 +140,25 @@ export default function Upload({ name, label, register, setValue, errors, video 
             setIsUploading(false)
             setUploadProgress(100)
             
+            uploadContext.updateUploadProgress(newUploadId, {
+              status: 'completed',
+              progress: 100,
+              result
+            })
+            
             // Set the result URL in the form
             setValue(name, result.secure_url)
+            
+            // Unregister upload after completion
+            setTimeout(() => {
+              uploadContext.unregisterUpload(newUploadId)
+            }, 2000)
           }
+        })
+        
+        // Update context with uploader reference
+        uploadContext.updateUploadProgress(newUploadId, {
+          uploader: resumableUploader
         })
         
         setUploader(resumableUploader)
@@ -123,7 +170,12 @@ export default function Upload({ name, label, register, setValue, errors, video 
         const result = await uploadFile(file, folder, {
           onProgress: (progressData) => {
             if (progressData) {
-              setUploadProgress(progressData.progress || 50) // Fallback progress for direct uploads
+              const progress = progressData.progress || 50
+              setUploadProgress(progress)
+              uploadContext.updateUploadProgress(newUploadId, {
+                progress,
+                status: 'uploading'
+              })
             }
           }
         })
@@ -134,8 +186,19 @@ export default function Upload({ name, label, register, setValue, errors, video 
         setIsUploading(false)
         setUploadProgress(100)
         
+        uploadContext.updateUploadProgress(newUploadId, {
+          status: 'completed',
+          progress: 100,
+          result
+        })
+        
         // Set the result URL in the form
         setValue(name, result.secure_url)
+        
+        // Unregister upload after completion
+        setTimeout(() => {
+          uploadContext.unregisterUpload(newUploadId)
+        }, 2000)
       }
       
     } catch (error) {
@@ -143,6 +206,13 @@ export default function Upload({ name, label, register, setValue, errors, video 
       setUploadError(error.message)
       setUploadStatus('error')
       setIsUploading(false)
+      
+      if (uploadId) {
+        uploadContext.updateUploadProgress(uploadId, {
+          status: 'error',
+          error: error.message
+        })
+      }
     }
   }
 

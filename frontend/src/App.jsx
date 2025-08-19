@@ -11,6 +11,7 @@ import AuthChecker from "./components/common/AuthChecker";
 import FaqButton from "./components/common/FaqButton";
 import { ACCOUNT_TYPE } from './utils/constants';
 import { HiArrowNarrowUp } from "react-icons/hi";
+import { UploadProvider } from "./contexts/UploadContext";
 
 // Loading component
 const LoadingSpinner = () => (
@@ -166,25 +167,26 @@ function App() {
   }, [showArrow]);
 
   return (
-    <div className="w-full min-h-screen bg-richblack-900 flex flex-col font-inter pt-12 xs:pt-14 sm:pt-16 md:pt-18 lg:pt-20 overflow-x-hidden">
-      <ModernNavbar />
-      <Toast />
+    <UploadProvider>
+      <div className="w-full min-h-screen bg-richblack-900 flex flex-col font-inter pt-12 xs:pt-14 sm:pt-16 md:pt-18 lg:pt-20 overflow-x-hidden">
+        <ModernNavbar />
+        <Toast />
 
-      {/* go upward arrow */}
-      <button
-        onClick={() => window.scrollTo(0, 0)}
-        className={`bg-yellow-25 hover:bg-yellow-50 hover:scale-110 p-3 text-lg text-black rounded-2xl fixed right-3 z-50 duration-500 ease-in-out ${
-          showArrow ? "bottom-6" : "-bottom-24"
-        } `}
-      >
-        <HiArrowNarrowUp />
-      </button>
+        {/* go upward arrow */}
+        <button
+          onClick={() => window.scrollTo(0, 0)}
+          className={`bg-yellow-25 hover:bg-yellow-50 hover:scale-110 p-3 text-lg text-black rounded-2xl fixed right-3 z-50 duration-500 ease-in-out ${
+            showArrow ? "bottom-6" : "-bottom-24"
+          } `}
+        >
+          <HiArrowNarrowUp />
+        </button>
 
-      {/* FAQ Button */}
-      <FaqButton />
+        {/* FAQ Button */}
+        <FaqButton />
 
-      <Suspense fallback={<LoadingSpinner />}>
-        <Routes>
+        <Suspense fallback={<LoadingSpinner />}>
+          <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/about" element={<About />} />
@@ -340,11 +342,12 @@ function App() {
           {/* Page Not Found (404 Page ) */}
           <Route path="*" element={<PageNotFound />} />
 
-        </Routes>
-      </Suspense>
+          </Routes>
+        </Suspense>
 
-      <AuthChecker />
-    </div>
+        <AuthChecker />
+      </div>
+    </UploadProvider>
   );
 }
 

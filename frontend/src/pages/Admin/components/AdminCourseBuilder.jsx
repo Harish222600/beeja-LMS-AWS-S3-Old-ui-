@@ -12,10 +12,12 @@ import { RxDropdownMenu } from "react-icons/rx"
 import { createSection, updateSection, deleteSection, createSubSection, updateSubSection, deleteSubSection, getFullDetailsOfCourse } from "../../../services/operations/courseDetailsAPI"
 import ConfirmationModal from "../../../components/common/ConfirmationModal"
 import AdminSubSectionModal from "./AdminSubSectionModal"
+import { useUpload } from "../../../contexts/UploadContext"
 
 export default function AdminCourseBuilder({ course, onCourseUpdate }) {
   const { register, handleSubmit, setValue, formState: { errors } } = useForm()
   const { token } = useSelector((state) => state.auth)
+  const uploadContext = useUpload()
   
   const [loading, setLoading] = useState(false)
   const [editSectionName, setEditSectionName] = useState(null)
@@ -550,15 +552,34 @@ export default function AdminCourseBuilder({ course, onCourseUpdate }) {
 
   // Discard all changes
   const discardChanges = () => {
+    const activeUploads = uploadContext.getAllActiveUploads()
+    const hasActiveUploads = activeUploads.length > 0
+    
+    let confirmationText = "All unsaved changes will be lost. This action cannot be undone."
+    
+    if (hasActiveUploads) {
+      confirmationText += `\n\nThis will also cancel ${activeUploads.length} active upload${activeUploads.length !== 1 ? 's' : ''}.`
+    }
+    
     setConfirmationModal({
       text1: "Discard Changes?",
-      text2: "All unsaved changes will be lost. This action cannot be undone.",
-      btn1Text: "Discard",
+      text2: confirmationText,
+      btn1Text: hasActiveUploads ? "Discard & Cancel Uploads" : "Discard",
       btn2Text: "Cancel",
       btn1Handler: () => {
+        console.log('🚫 Discarding changes and cancelling uploads...')
+        
+        // Cancel all active uploads first
+        if (hasActiveUploads) {
+          const result = uploadContext.cancelAllUploads()
+          console.log(`📊 Upload cancellation result: ${result.cancelled} cancelled, ${result.errors} errors`)
+        }
+        
+        // Reset course data to original state
         setCourseData(JSON.parse(JSON.stringify(originalCourseData)))
         setHasUnsavedChanges(false)
-        // Remove toast - changes being discarded is obvious from UI reset
+        
+        console.log('✅ Changes discarded and uploads cancelled')
         setConfirmationModal(null)
       },
       btn2Handler: () => setConfirmationModal(null),
