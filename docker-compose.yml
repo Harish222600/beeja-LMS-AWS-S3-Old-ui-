@@ -5,6 +5,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    image: lms-backend-image
     container_name: lms-backend
     ports:
       - "5001:5001"
@@ -12,7 +13,6 @@ services:
       - NODE_ENV=production
       - PORT=5001
       - MONGODB_URL=mongodb://mongo:27017/lms
-      # Add other environment variables as needed
     volumes:
       - ./backend:/app
       - /app/node_modules
@@ -23,6 +23,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    image: lms-frontend-image
     container_name: lms-frontend
     ports:
       - "5173:80"
@@ -33,10 +34,3 @@ services:
     image: mongo:6.0
     container_name: lms-mongo
     restart: always
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
-
-volumes:
-  mongo-data:
