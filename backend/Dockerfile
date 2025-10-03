@@ -21,5 +21,5 @@ COPY . .
 # Expose port
 EXPOSE 5001
 
-# Start the server
-CMD ["node", "server.js"]
+# Start the server via npm to trigger prestart seed
+CMD ["npm", "start"]
